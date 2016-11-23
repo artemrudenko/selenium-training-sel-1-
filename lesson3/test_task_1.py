@@ -27,7 +27,10 @@ def driver(request):
     return wd
 
 
-def test_1(driver):
+def test_menu_activation(driver):
+    """
+        This tests verifies that is possible to click on all menu items and sub items.
+    """
     wait = WebDriverWait(driver, 10)
     driver.get(url)
     find_element, find_elements = driver.find_element, driver.find_elements
