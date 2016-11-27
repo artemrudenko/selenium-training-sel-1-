@@ -1,9 +1,6 @@
 import pytest
 from selenium import webdriver
-from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 
 
 login, pwd = 'admin', 'admin'
@@ -45,11 +42,8 @@ def getColumnIndex2(table, text):
 def get_table_column_values(table, column, child=None):
     index = getColumnIndex2(table, column)
     assert index != -1, '{column} column was not found!'.format(column=column)
-    locator = 'tr.row td:nth-of-type({index})'.format(index=index) + (' ' + child) if child else ''
-    # if child is None:
+    locator = 'tr.row td:nth-of-type({index})'.format(index=index) + ((' ' + child) if child else '')
     return [el.text for el in table.find_elements(By.CSS_SELECTOR, locator)]
-    # else:
-    #     return [el.getAttribute('value') for el in table.find_elements(By.CSS_SELECTOR, locator)]
 
 
 def test_countries_sort(driver):
@@ -63,18 +57,12 @@ def test_multizones_countries_sort(driver):
     init(driver, 'http://localhost/litecart/admin/?app=countries&doc=countries')
     find_element, find_elements = driver.find_element, driver.find_elements
     table = driver.find_element(By.CSS_SELECTOR, '.dataTable')
+    non_empty_zones = [i for i, v in enumerate(get_table_column_values(table, 'Zones')) if int(v) != 0]
     countryNameIndex = getColumnIndex2(table, 'Name')
-    # assert countryNameIndex != -1, 'Name column was not found!'
-    zonesIndex = getColumnIndex2(table, 'Zones')
-    assert zonesIndex != -1, 'Zones column was not found!'
-    rowsCount = len(table.find_elements(By.CSS_SELECTOR, 'tr.row'))
-    for idx in range(2, rowsCount+2):
-        row = find_element(By.CSS_SELECTOR, '.dataTable tr.row:nth-of-type('+str(idx)+')')
-        zones = row.find_element(By.CSS_SELECTOR, 'td:nth-of-type('+str(zonesIndex)+')').text
-        if int(zones) == 0:
-            continue
+    for idx in non_empty_zones:
+        row = find_element(By.CSS_SELECTOR, '.dataTable tr.row:nth-of-type('+str(idx+2)+')')
+        row.find_element(By.CSS_SELECTOR, 'td:nth-of-type('+str(countryNameIndex)+') a').click()
         try:
-            row.find_element(By.CSS_SELECTOR, 'td:nth-of-type('+str(countryNameIndex)+') a').click()
             tableZ = driver.find_element(By.ID, 'table-zones')
             zones = get_table_column_values(tableZ, 'Name')
             assert zones == sorted(zones), "SubZones have to be displayed sorted"
