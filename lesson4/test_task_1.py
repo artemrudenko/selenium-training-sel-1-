@@ -81,8 +81,7 @@ def test_multizones_countries_sort(driver):
     table = driver.find_element(*Locators.TABLE)
     non_empty_zones = [i for i, v in enumerate(get_table_column_values(table, 'Zones')) if int(v) != 0]
     countryNameIndex = str(getColumnIndex2(table, 'Name'))
-    for idx in non_empty_zones:
-        rowId = str(idx + 2)
+    for rowId in (str(x+2) for x in non_empty_zones):
         row = find_element(By.CSS_SELECTOR, 'tr.row:nth-of-type(' + rowId + ')')
         row.find_element(By.CSS_SELECTOR, 'td:nth-of-type(' + countryNameIndex + ') a').click()
         try:
@@ -97,8 +96,7 @@ def test_zones_sorting(driver):
     table = driver.find_element(*Locators.TABLE)
     countryNameIndex = str(getColumnIndex2(table, 'Name'))
     rowsCount = len(table.find_elements(By.CSS_SELECTOR, 'tr.row'))
-    for idx in range(2, rowsCount+2):
-        rowId = str(idx)
+    for rowId in (str(x) for x in range(2, rowsCount+2)):
         row = find_element(By.CSS_SELECTOR, 'tr.row:nth-of-type(' + rowId + ')')
         row.find_element(By.CSS_SELECTOR, 'td:nth-of-type(' + countryNameIndex + ') a').click()
         try:
