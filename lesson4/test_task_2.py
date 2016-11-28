@@ -22,6 +22,11 @@ def driver(request):
     return wd
 
 
+def get_element_style_info(element, props=None):
+    cssProperties = props if props is not None else ['color', 'text-decoration', 'font-weight', 'font-size']
+    return dict((prop, element.value_of_css_property(prop)) for prop in cssProperties)
+
+
 def test_product_opening(driver):
     driver.get(URL)
     box = driver.find_element(*Locators.CAMPAIGNS)
@@ -42,9 +47,22 @@ def test_product_opening(driver):
                 "Check that opened product has the same attributes as one user trying to open")
 
 
-def get_element_style_info(element, props=None):
-    cssProperties = props if props is not None else ['color', 'text-decoration', 'font-weight', 'font-size']
-    return dict((prop, element.value_of_css_property(prop)) for prop in cssProperties)
+def test_product_opening_hard_assert(driver):
+    driver.get(URL)
+    box = driver.find_element(*Locators.CAMPAIGNS)
+    owner = box.find_element(By.CSS_SELECTOR, '.products .product:nth-of-type({index})'.format(index=1))
+    name = owner.find_element(By.CLASS_NAME, 'name').text
+    manufacturer = owner.find_element(By.CSS_SELECTOR, '.manufacturer').text
+    regular_price = owner.find_element(*Locators.REGULAR_PRICE).text
+    campaign_price = owner.find_element(*Locators.CAMPAIGN_PRICE).text
+    owner.click()
+
+    owner = driver.find_element(*Locators.PRODUCT)
+    assert_that(owner.find_element(By.CLASS_NAME, 'title').text, equal_to(name), "Product name")
+    title = owner.find_element(By.CSS_SELECTOR, '.manufacturer img').get_attribute('title')
+    assert_that(title, equal_to(manufacturer), "Manufacturer name")
+    assert_that(owner.find_element(*Locators.REGULAR_PRICE).text, equal_to(regular_price), "Regular price")
+    assert_that(owner.find_element(*Locators.CAMPAIGN_PRICE).text, equal_to(campaign_price), "Campaign price")
 
 
 def test_campaign_styles(driver):
@@ -69,3 +87,33 @@ def test_campaign_styles(driver):
     displayed['campaign-price-product'] = get_element_style_info(owner.find_element(*Locators.CAMPAIGN_PRICE))
 
     assert_that(displayed, has_entries(expected), 'Check styles')
+
+
+def test_campaign_styles_hard_assert(driver):
+    expected = {'regular-price-home': {'color': 'rgba(119, 119, 119, 1)', 'text-decoration': 'line-through',
+                                       'font-weight': 'normal', 'font-size': '14.4px'},
+                'campaign-price-home': {'color': 'rgba(204, 0, 0, 1)', 'text-decoration': 'none',
+                                        'font-weight': 'bold', 'font-size': '18px'},
+                'regular-price-product': {'color': 'rgba(102, 102, 102, 1)', 'text-decoration': 'line-through',
+                                          'font-weight': 'normal', 'font-size': '16px'},
+                'campaign-price-product': {'color': 'rgba(204, 0, 0, 1)', 'text-decoration': 'none',
+                                           'font-weight': 'bold', 'font-size': '22px'}}
+
+    driver.get(URL)
+    box = driver.find_element(*Locators.CAMPAIGNS)
+    owner = box.find_element(By.CSS_SELECTOR, '.products .product:nth-of-type({index})'.format(index=1))
+
+    style = get_element_style_info(owner.find_element(*Locators.REGULAR_PRICE))
+    assert_that(style, expected['regular-price-home'], 'regular-price-home style')
+
+    style = get_element_style_info(owner.find_element(*Locators.CAMPAIGN_PRICE))
+    assert_that(style, expected['campaign-price-home'], 'campaign-price-home style')
+
+    owner.click()
+    owner = driver.find_element(*Locators.PRODUCT)
+
+    style = get_element_style_info(owner.find_element(*Locators.REGULAR_PRICE))
+    assert_that(style, expected['regular-price-product'], 'regular-price-product style')
+
+    style = get_element_style_info(owner.find_element(*Locators.CAMPAIGN_PRICE))
+    assert_that(style, expected['campaign-price-product'], 'campaign-price-product style')
