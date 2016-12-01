@@ -1,3 +1,4 @@
+import os
 import random
 import pytest
 import logging
@@ -65,7 +66,8 @@ def test_add_product(driver):
     logger.debug("adding product with name: {name}".format(name=name))
     fill_general_info(driver, True, name=name, code=fake.ean8(), quantity=random.randint(1, 100),
                       dateValidFrom=(date.today() + timedelta(days=random.randint(1, 10))).strftime('%m%d%Y'),
-                      dateValidTo=(date.today() + timedelta(days=random.randint(20, 100))).strftime('%m%d%Y'))
+                      dateValidTo=(date.today() + timedelta(days=random.randint(20, 100))).strftime('%m%d%Y'),
+                      impPath=choose_image())
     fill_information(driver, manufacturer='ACME Corp.', keywords=fake.words(nb=3),
                      shortDescription=fake.text(max_nb_chars=50),
                      description=fake.paragraphs(nb=3), title=fake.word() + ' Duck')
@@ -87,7 +89,7 @@ def save_changes(drv):
 
 
 @log
-def fill_general_info(drv, enabled, name, code, quantity, dateValidFrom, dateValidTo):
+def fill_general_info(drv, enabled, name, code, quantity, impPath, dateValidFrom, dateValidTo):
     switch_tab(drv, 'General')
     value = '1' if enabled else '0'
     drv.find_element_by_css_selector("input[type='radio'][value='{value}']".format(value=value)).click()
@@ -96,6 +98,7 @@ def fill_general_info(drv, enabled, name, code, quantity, dateValidFrom, dateVal
     include_table_rows_by_value(drv, 'Categories', ['Subcategory'])
     include_table_rows_by_value(drv, 'Product Groups', ['Male', 'Female'])
     typeIn(drv.find_element_by_name('quantity'), quantity)
+    drv.find_element_by_name("new_images[]").send_keys(impPath)
     drv.find_element_by_name('date_valid_from').send_keys(dateValidFrom)
     drv.find_element_by_name('date_valid_to').send_keys(dateValidTo)
 
@@ -140,3 +143,12 @@ def add_campaign(drv, startDate, endDate, usd):
     set_datetime(drv, prefix + "[start_date]", startDate)
     set_datetime(drv, prefix + "[end_date]", endDate)
     typeIn(table.find_element_by_name(prefix + '[USD]'), usd)
+
+
+def choose_image():
+    path = os.path.join(os.getcwd(), 'import')
+    candidates = []
+    for root, dirs, files in os.walk(path, topdown=False):
+        for fname in files:
+            candidates.append(os.path.join(root, fname))
+    return random.choice(candidates)
