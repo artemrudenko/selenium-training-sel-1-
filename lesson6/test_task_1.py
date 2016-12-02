@@ -55,7 +55,7 @@ def driver():
     wait = None
 
 
-def test_product_opening(driver):
+def test_cart_workflow(driver):
     driver.get(URL)
     for candidate in generate_candidates(driver):
         add_product_to_cart(driver, candidate)
