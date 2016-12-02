@@ -35,12 +35,9 @@ def log(func):
 
 class Locators(object):
     POPULAR = By.ID, 'box-most-popular'
-    PRODUCTS = By.CLASS_NAME, 'products'
-    REMOVE = By.NAME, 'remove_cart_item'
     SIZE = By.NAME, 'options[Size]'
     CART_QUANTITY = By.CSS_SELECTOR, '#cart .quantity'
     ADD_TO_CART = By.NAME, 'add_cart_product'
-    REMOVE_FROM_CART = By.NAME, 'remove_cart_item'
     CHECKOUT = By.PARTIAL_LINK_TEXT, 'Checkout'
     HOME = By.CLASS_NAME, 'fa-home'
     CART_TEXT = By.TAG_NAME, 'em'
