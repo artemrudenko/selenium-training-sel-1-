@@ -10,8 +10,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
-from utils import is_element_present
-from utils import selectFrom
+from utils import is_element_present, selectFrom
+
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
