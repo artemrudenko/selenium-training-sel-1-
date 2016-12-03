@@ -10,8 +10,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
-from utils import is_element_present
-from utils import selectFrom
+from utils import is_element_present, selectFrom
+
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -22,7 +22,20 @@ sh.setFormatter(formatter)
 logger.addHandler(sh)
 
 URL = 'http://localhost/litecart/en/'
-wait = None
+
+
+class Helper(object):
+    def __init__(self, drv):
+        self._wd = drv
+        self._wait = WebDriverWait(drv, 20)
+
+    @property
+    def wd(self):
+        return self._wd
+
+    @property
+    def wait(self):
+        return self._wait
 
 
 def log(func):
@@ -47,66 +60,64 @@ class Locators(object):
 
 @pytest.yield_fixture
 def driver():
-    global wait
-    _wd = webdriver.Chrome()
-    wait = WebDriverWait(_wd, 20)
-    yield _wd
-    _wd.quit()
-    wait = None
+    _helper = Helper(webdriver.Chrome())
+    yield _helper
+    _helper.wd.quit()
 
 
 def test_cart_workflow(driver):
-    driver.get(URL)
+    wd = driver.wd
+    wd.get(URL)
     for candidate in generate_candidates(driver):
         add_product_to_cart(driver, candidate)
     goto_checkout(driver)
-    while driver.find_elements(By.CSS_SELECTOR, 'li.item'):
+    while wd.find_elements(By.CSS_SELECTOR, 'li.item'):
         remove_first_product_from_cart(driver)
-    wait.until(EC.text_to_be_present_in_element(Locators.CART_TEXT, 'There are no items in your cart.'))
-    assert wait.until(EC.text_to_be_present_in_element(Locators.CART_TEXT, 'There are no items in your cart.')), \
+    driver.wait.until(EC.text_to_be_present_in_element(Locators.CART_TEXT, 'There are no items in your cart.'))
+    assert driver.wait.until(EC.text_to_be_present_in_element(Locators.CART_TEXT, 'There are no items in your cart.')), \
         "Empty cart text missed"
 
 
 def generate_candidates(drv):
-    box = drv.find_element(*Locators.POPULAR)
+    box = drv.wd.find_element(*Locators.POPULAR)
     available = [el.text for el in box.find_elements(By.CLASS_NAME, 'name')]
     return random.sample(available, min(len(available), 3))
 
 
 def goto_checkout(drv):
-    drv.find_element(*Locators.CHECKOUT).click()
-    wait.until(EC.title_is('Checkout | My Store'))
+    drv.wd.find_element(*Locators.CHECKOUT).click()
+    drv.wait.until(EC.title_is('Checkout | My Store'))
 
 
 def goto_home(drv):
-    drv.find_element(*Locators.HOME).click()
-    wait.until(EC.title_is('Online Store | My Store'))
+    drv.wd.find_element(*Locators.HOME).click()
+    drv.wait.until(EC.title_is('Online Store | My Store'))
 
 
 def open_product(drv, product):
     # currently adding product only from the popular category
-    box = drv.find_element(*Locators.POPULAR)
+    box = drv.wd.find_element(*Locators.POPULAR)
     box.find_element(By.XPATH, "//li[contains(@class, 'product')]/a/div[contains(., '" + product + "')]").click()
-    wait.until(EC.presence_of_element_located((By.ID, 'box-product')))
+    drv.wait.until(EC.presence_of_element_located((By.ID, 'box-product')))
 
 
 @log
 def add_product_to_cart(drv, product):
     logger.info("Going add product: {product}".format(product=product))
-    before = int(drv.find_element(*Locators.CART_QUANTITY).text)
+    before = int(drv.wd.find_element(*Locators.CART_QUANTITY).text)
     open_product(drv, product)
-    if is_element_present(drv, Locators.SIZE):
-        selectFrom(drv.find_element(*Locators.SIZE), 'Small')
-    wait.until(EC.element_to_be_clickable(Locators.ADD_TO_CART))
-    drv.find_element(*Locators.ADD_TO_CART).click()
-    wait.until(lambda d: d.find_element(*Locators.CART_QUANTITY).text == str(before + 1))
+    if is_element_present(drv.wd, Locators.SIZE):
+        selectFrom(drv.wd.find_element(*Locators.SIZE), 'Small')
+    drv.wait.until(EC.element_to_be_clickable(Locators.ADD_TO_CART))
+    drv.wd.find_element(*Locators.ADD_TO_CART).click()
+    drv.wait.until(lambda d: d.find_element(*Locators.CART_QUANTITY).text == str(before + 1))
     goto_home(drv)
 
 
 def remove_first_product_from_cart(drv):
-    wait.until(EC.element_to_be_clickable(Locators.REMOVE_ITEM))
-    table = drv.find_element(*Locators.TABLE)
-    remove = drv.find_element(*Locators.REMOVE_ITEM)
+    drv.wait.until(EC.element_to_be_clickable(Locators.REMOVE_ITEM))
+    table = drv.wd.find_element(*Locators.TABLE)
+    remove = drv.wd.find_element(*Locators.REMOVE_ITEM)
     remove.click()
-    wait.until(EC.staleness_of(remove))
-    wait.until(EC.staleness_of(table))
+    drv.wait.until(EC.staleness_of(remove))
+    drv.wait.until(EC.staleness_of(table))
