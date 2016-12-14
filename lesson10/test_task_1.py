@@ -19,6 +19,7 @@ sh.setFormatter(formatter)
 logger.addHandler(sh)
 
 URL = 'http://localhost/litecart/admin/'
+PRODUCT_URL = 'http://localhost/litecart/admin/?app=catalog&doc=catalog&category_id=1'
 
 
 class Helper(object):
@@ -69,14 +70,50 @@ def test_browser_logs_on_product_opening(driver):
     """
     init(driver)
     logger.debug('Available log types: {}'.format(driver.wd.log_types))
-    url = 'http://localhost/litecart/admin/?app=catalog&doc=catalog&category_id=1'
-    driver.wd.get(url)
-    # not(i) to skip 'Edit' link
-    links = [el.get_attribute('href') for el in driver.wd.find_elements(By.XPATH,
-                                                                        '//a[contains(@href, "product_id") and not(i)]')]
+    open_products_page(driver)
+    links = get_products_links(driver)
     for href in links:
-        driver.wd.get(url)
-        product = driver.wd.find_element(By.XPATH, '//a[@href="' + href + '" and not(i)]')
-        logger.info("Opening: '{}' href: {}".format(product.text, href))
-        product.click()
+        open_products_page(driver)
+        init_product_edit_by_href(driver, href)
         assert_that(driver.wd.get_log("browser"), empty(), "Browser log should be empty")
+
+
+def test_browser_logs_on_product_opening_soft_assert(driver):
+    """
+        Сделайте сценарий, который проверяет, не появляются ли сообщения об ошибках при открытии страниц в учебном
+        приложении, а именно -- страниц товаров в каталоге в административной панели.
+
+        Сценарий должен состоять из следующих частей:
+            #) зайти в админку
+            #) открыть каталог, категорию, которая содержит товары (страница http://localhost/litecart/admin/?app=catalog&doc=catalog&category_id=1)
+            #) последовательно открывать страницы товаров и проверять, не появляются ли в логе браузера сообщения об ошибках (любого уровня критичности)
+    """
+    init(driver)
+    logger.debug('Available log types: {}'.format(driver.wd.log_types))
+    open_products_page(driver)
+    # not(i) to skip 'Edit' link
+    browserLogs = {}
+    links = get_products_links(driver)
+    for href in links:
+        open_products_page(driver)
+        init_product_edit_by_href(driver, href=href)
+        logs = driver.wd.get_log("browser")
+        if logs:
+            browserLogs[href] = logs
+    assert_that(browserLogs.keys(), empty(), "Logs should be empty. Current: {}".format(browserLogs))
+
+
+def get_products_links(drv):
+    # not(i) to skip 'Edit' link
+    locator = By.XPATH, '//a[contains(@href, "product_id") and not(i)]'
+    return [el.get_attribute('href') for el in drv.wd.find_elements(*locator)]
+
+
+def open_products_page(drv):
+    drv.wd.get(PRODUCT_URL)
+
+
+def init_product_edit_by_href(drv, href):
+    product = drv.wd.find_element(By.XPATH, '//a[@href="' + href + '" and not(i)]')
+    logger.info("Opening: '{}' href: {}".format(product.text, href))
+    product.click()
