@@ -4,12 +4,13 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/PYTHON.iml" filepath="$PROJECT_DIR$/PYTHON.iml" />
       <module fileurl="file://$PROJECT_DIR$/lesson10/lesson10.iml" filepath="$PROJECT_DIR$/lesson10/lesson10.iml" />
-      <module fileurl="file://$PROJECT_DIR$/lesson3/lesson3.iml" filepath="$PROJECT_DIR$/lesson3/lesson3.iml" />
-      <module fileurl="file://$PROJECT_DIR$/lesson4/lesson4.iml" filepath="$PROJECT_DIR$/lesson4/lesson4.iml" />
-      <module fileurl="file://$PROJECT_DIR$/lesson5/lesson5.iml" filepath="$PROJECT_DIR$/lesson5/lesson5.iml" />
-      <module fileurl="file://$PROJECT_DIR$/lesson6/lesson6.iml" filepath="$PROJECT_DIR$/lesson6/lesson6.iml" />
-      <module fileurl="file://$PROJECT_DIR$/lesson7/lesson7.iml" filepath="$PROJECT_DIR$/lesson7/lesson7.iml" />
-      <module fileurl="file://$PROJECT_DIR$/lesson_2/lesson_2.iml" filepath="$PROJECT_DIR$/lesson_2/lesson_2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lesson11/lesson11.iml" filepath="$PROJECT_DIR$/lesson11/lesson11.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lesson2/lesson_2.iml" filepath="$PROJECT_DIR$/lesson2/lesson_2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lesson4/lesson3.iml" filepath="$PROJECT_DIR$/lesson4/lesson3.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lesson5/lesson4.iml" filepath="$PROJECT_DIR$/lesson5/lesson4.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lesson6/lesson5.iml" filepath="$PROJECT_DIR$/lesson6/lesson5.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lesson7/lesson6.iml" filepath="$PROJECT_DIR$/lesson7/lesson6.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lesson8/lesson8.iml" filepath="$PROJECT_DIR$/lesson8/lesson8.iml" />
     </modules>
   </component>
 </project>
