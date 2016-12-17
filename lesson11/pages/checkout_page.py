@@ -8,6 +8,7 @@ from selenium.webdriver.support import expected_conditions as EC
 class CheckoutPage(Page):
 
     url = "http://localhost/litecart/en/checkout"
+    # url = "http://192.168.1.5/litecart/en/checkout"
 
     def open(self):
         if not self.is_on_page():
