@@ -8,6 +8,8 @@ class Application:
 
     def __init__(self):
         self.driver = webdriver.Chrome()
+        # self.driver = webdriver.Remote("http://192.168.1.5:4444/wd/hub",
+        #                                desired_capabilities={'browserName': 'chrome'})
         self.home_page = HomePage(self.driver)
         self.product_page = ProductPage(self.driver)
         self.checkout_page = CheckoutPage(self.driver)

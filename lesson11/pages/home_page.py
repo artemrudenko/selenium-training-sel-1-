@@ -6,6 +6,7 @@ from pages.page_w_cart import PageWCart
 
 class HomePage(PageWCart):
     url = "http://localhost/litecart/en/"
+    # url = "http://192.168.1.5/litecart/en/"
 
     def open(self):
         if not self.is_on_page():
