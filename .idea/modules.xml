@@ -11,6 +11,7 @@
       <module fileurl="file://$PROJECT_DIR$/lesson6/lesson6.iml" filepath="$PROJECT_DIR$/lesson6/lesson6.iml" />
       <module fileurl="file://$PROJECT_DIR$/lesson7/lesson7.iml" filepath="$PROJECT_DIR$/lesson7/lesson7.iml" />
       <module fileurl="file://$PROJECT_DIR$/lesson8/lesson8.iml" filepath="$PROJECT_DIR$/lesson8/lesson8.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pytest_bdd_sample/pytest_bdd_sample.iml" filepath="$PROJECT_DIR$/pytest_bdd_sample/pytest_bdd_sample.iml" />
     </modules>
   </component>
 </project>
